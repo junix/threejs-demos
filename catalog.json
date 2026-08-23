@@ -1,0 +1,14 @@
+[
+  {"id":"orbital","use":"astronomical","family":"astronomical","question":"How can a spatial instrument show nested orbital families?","complexity":"advanced","tags":["orbit","instrument","3d"]},
+  {"id":"terrain","use":"scientific surface","family":"scientific surface","question":"How can a spectral field become an explorable terrain?","complexity":"advanced","tags":["surface","wireframe","field"]},
+  {"id":"crystal","use":"generative sculpture","family":"generative sculpture","question":"How can repeated polyhedra form a coherent crystal field?","complexity":"advanced","tags":["instancing","crystal","sculpture"]},
+  {"id":"molecule","use":"molecular","family":"molecular","question":"How can bond geometry and atom classes remain legible in 3D?","complexity":"advanced","tags":["molecule","bonds","science"]},
+  {"id":"city","use":"spatial system","family":"spatial system","question":"How can urban density and circulation be expressed without a basemap?","complexity":"advanced","tags":["city","instancing","urban"]},
+  {"id":"globe","use":"geospatial","family":"geospatial","question":"How can routes and stations wrap a transparent globe?","complexity":"advanced","tags":["globe","routes","geospatial"]},
+  {"id":"ribbons","use":"flow field","family":"flow field","question":"How can layered ribbons expose the structure of a vector flow?","complexity":"advanced","tags":["ribbon","flow","curve"]},
+  {"id":"lattice","use":"material science","family":"material science","question":"How do unit cells repeat into a readable lattice?","complexity":"advanced","tags":["lattice","instancing","materials"]},
+  {"id":"vectors","use":"scientific glyphs","family":"scientific glyphs","question":"How can directional glyphs encode a three-dimensional field?","complexity":"advanced","tags":["vectors","glyphs","field"]},
+  {"id":"knots","use":"topology","family":"topology","question":"How can several knot families be compared in one scene?","complexity":"advanced","tags":["knot","topology","curves"]},
+  {"id":"particles","use":"particle system","family":"particle system","question":"How does a seeded particle shell reveal spatial density?","complexity":"advanced","tags":["particles","points","density"]},
+  {"id":"metaballs","use":"implicit surface","family":"implicit surface","question":"How can overlapping fields suggest an organic implicit surface?","complexity":"advanced","tags":["metaball","organic","surface"]}
+]
