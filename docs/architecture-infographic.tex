@@ -1,0 +1,343 @@
+% Three.js Demos — 架构叙事信息图
+% 编译: xelatex -interaction=nonstopmode architecture-infographic.tex
+% 导出: dvisvgm --pdf --no-fonts architecture-infographic.pdf
+%       pdftoppm -r 150 -png architecture-infographic.pdf architecture-infographic
+\documentclass[border=12pt,varwidth=20cm]{standalone}
+\usepackage[UTF8,fontset=none]{ctex}
+\IfFontExistsTF{Source Han Serif SC}{
+  \setmainfont[BoldFont={Source Han Serif SC Bold}]{Source Han Serif SC}
+  \setsansfont[BoldFont={Source Han Sans SC Bold}]{Source Han Sans SC}
+  \setCJKmainfont[BoldFont={Source Han Serif SC Bold}]{Source Han Serif SC}
+  \setCJKsansfont[BoldFont={Source Han Sans SC Bold}]{Source Han Sans SC}
+}{
+  \PackageWarningNoLine{tikz-infographic}{Source Han Serif SC not found; using Fandol}
+  \setCJKmainfont[BoldFont={FandolSong-Bold}]{FandolSong-Regular}
+  \setCJKsansfont[BoldFont={FandolHei-Bold}]{FandolHei-Regular}
+}
+\IfFontExistsTF{Sarasa Mono SC}{
+  \setmonofont{Sarasa Mono SC}
+  \setCJKmonofont{Sarasa Mono SC}
+}{
+  \setmonofont{Latin Modern Mono}
+  \setCJKmonofont{FandolFang-Regular}
+}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{listings}
+\usetikzlibrary{arrows.meta,backgrounds,calc,fit,positioning,shapes.geometric,shapes.misc}
+\pgfdeclarelayer{edge layer}
+\pgfdeclarelayer{bg}
+\pgfsetlayers{bg,edge layer,main}
+
+% ── Semantic palette ──────────────────────────────────────────────────────
+\definecolor{Paper}{HTML}{F7F4EE}
+\definecolor{Ink}{HTML}{17212B}
+\definecolor{Slate}{HTML}{5D6873}
+\definecolor{Fog}{HTML}{D9E1E3}
+\definecolor{Ocean}{HTML}{356A79}
+\definecolor{Teal}{HTML}{2A9D8F}
+\definecolor{Mint}{HTML}{DDF2EC}
+\definecolor{Coral}{HTML}{E76F51}
+\definecolor{Gold}{HTML}{E9C46A}
+\definecolor{Sand}{HTML}{F0E6D2}
+\definecolor{Lavender}{HTML}{8B7EC8}
+\definecolor{Ice}{HTML}{E8F1F5}
+
+% 12 场景主题色（源自项目中的 colors 数组）
+\definecolor{C1}{HTML}{54D6C6}  % 青
+\definecolor{C2}{HTML}{FFD166}  % 金
+\definecolor{C3}{HTML}{FF6F91}  % 粉
+\definecolor{C4}{HTML}{7B9CFF}  % 蓝
+\definecolor{C5}{HTML}{B889FF}  % 紫
+\definecolor{C6}{HTML}{62B9FF}  % 天蓝
+
+\tikzset{
+  every node/.style={font=\rmfamily},
+  % ── Spine / path ──
+  spine/.style={draw=Fog, line width=5mm, line cap=butt, line join=round},
+  stage/.style={
+    circle, draw=Ocean, fill=Ocean, text=white, inner sep=0pt,
+    minimum size=7.2mm, font=\rmfamily\scriptsize\bfseries
+  },
+  % ── Boxes / boundaries ──
+  system/.style={
+    draw=Ocean!45, fill=white, rounded corners=2mm, line width=.75pt,
+    minimum width=24mm, minimum height=9mm, align=center,
+    font=\rmfamily\footnotesize\bfseries, text=Ink
+  },
+  scene-cell/.style={
+    draw=Fog!70, fill=white, rounded corners=1.5mm, line width=.6pt,
+    minimum width=36mm, minimum height=12mm, align=left,
+    inner xsep=3mm, inner ysep=2mm
+  },
+  % ── Edges ──
+  call/.style={
+    -{Latex[length=2mm,width=1.4mm]}, draw=Ocean,
+    line width=.9pt, rounded corners=2mm
+  },
+  reply/.style={
+    -{Latex[length=2mm,width=1.4mm]}, draw=Teal,
+    densely dashed, line width=.8pt, rounded corners=2mm
+  },
+  verify/.style={
+    -{Latex[length=2mm,width=1.4mm]}, draw=Coral,
+    line width=.8pt, rounded corners=2mm
+  },
+  boundary/.style={draw=Slate!40, dash pattern=on 2pt off 2.2pt, line width=.55pt},
+  % ── Text styles ──
+  stage label/.style={font=\rmfamily\footnotesize\bfseries, text=Ink},
+  edge label/.style={font=\rmfamily\scriptsize, text=Slate},
+  terminal/.style={font=\rmfamily\scriptsize\bfseries, text=Ocean},
+  note/.style={font=\rmfamily\scriptsize, text=Slate},
+  kicker/.style={font=\rmfamily\scriptsize\bfseries, text=Teal},
+  pill/.style={
+    rounded corners=3mm, fill=Mint, text=Ocean,
+    inner xsep=2.5mm, inner ysep=1mm,
+    font=\rmfamily\scriptsize\bfseries
+  },
+  scene-id/.style={font=\rmfamily\footnotesize\bfseries, text=Ink},
+  scene-tag/.style={font=\rmfamily\scriptsize, text=Slate},
+  % 场景色点
+  color-dot/.style={circle, inner sep=0pt, minimum size=3.2mm},
+  % 验证项徽章
+  check-badge/.style={
+    draw=Coral!40, fill=white, rounded corners=2mm, line width=.6pt,
+    inner xsep=2.5mm, inner ysep=1.5mm,
+    minimum width=26mm, minimum height=11mm,
+    font=\rmfamily\scriptsize, text=Ink, align=center
+  },
+  % 技术栈条
+  tech-pill/.style={
+    rounded corners=2mm, fill=Ice, text=Ocean,
+    inner xsep=2.2mm, inner ysep=.8mm,
+    font=\rmfamily\scriptsize\bfseries
+  },
+}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\begin{tikzpicture}[x=1cm,y=1cm]
+
+% ── Background paper ──────────────────────────────────────────────────────
+\begin{pgfonlayer}{bg}
+  \fill[Paper,rounded corners=2mm] (-.6,.5) rectangle (18.2,20.8);
+\end{pgfonlayer}
+
+% ══════════════════════════════════════════════════════════════════════════
+% HEADER
+% ══════════════════════════════════════════════════════════════════════════
+\node[kicker,anchor=west] at (0,20.15) {THREE.JS DEMOS · WebGL 可视化参考库};
+\node[anchor=west,font=\rmfamily\Large\bfseries,text=Ink]
+  at (0,19.55) {十二场透明渲染的 Three.js 构图实验};
+\node[note,anchor=west] at (0,19.05)
+  {catalog.json 驱动的场景目录 · 真 alpha WebGL 渲染 · Playwright 截图与像素级验证闭环};
+\node[pill,anchor=east] at (18,19.55) {12 scenes · TypeScript · Vite};
+
+% 分隔线
+\draw[boundary] (0,18.55) -- (18,18.55);
+
+% ══════════════════════════════════════════════════════════════════════════
+% PANEL 1: 场景目录图谱（12 场景，4 列 × 3 行）
+% ══════════════════════════════════════════════════════════════════════════
+\node[kicker,anchor=west] at (0,18.15) {01 · 场景目录};
+\node[anchor=west,font=\rmfamily\large\bfseries,text=Ink]
+  at (0,17.55) {十二场不同族类的 WebGL 构图};
+
+% 4列 x 3行，每格包含: 色点 + 场景ID + 族类标签
+% 行1 (top): orbital, terrain, crystal, molecule
+% 行2: city, globe, ribbons, lattice
+% 行3: vectors, knots, particles, metaballs
+
+% --- Row 1 (y ≈ 16.75) ---
+% orbital
+\node[scene-cell] (sc1) at (2.2, 16.75) {};
+\node[color-dot,fill=C1,anchor=west] at (sc1.west) {};
+\node[scene-id,anchor=west] at ($(sc1.west)+(4mm,1.5mm)$) {orbital};
+\node[scene-tag,anchor=west] at ($(sc1.west)+(4mm,-2mm)$) {天文 · 轨道家族};
+
+% terrain
+\node[scene-cell] (sc2) at (6.6, 16.75) {};
+\node[color-dot,fill=C2,anchor=west] at (sc2.west) {};
+\node[scene-id,anchor=west] at ($(sc2.west)+(4mm,1.5mm)$) {terrain};
+\node[scene-tag,anchor=west] at ($(sc2.west)+(4mm,-2mm)$) {科学曲面 · 谱域地形};
+
+% crystal
+\node[scene-cell] (sc3) at (11.0, 16.75) {};
+\node[color-dot,fill=C3,anchor=west] at (sc3.west) {};
+\node[scene-id,anchor=west] at ($(sc3.west)+(4mm,1.5mm)$) {crystal};
+\node[scene-tag,anchor=west] at ($(sc3.west)+(4mm,-2mm)$) {生成雕塑 · 实例化};
+
+% molecule
+\node[scene-cell] (sc4) at (15.4, 16.75) {};
+\node[color-dot,fill=C4,anchor=west] at (sc4.west) {};
+\node[scene-id,anchor=west] at ($(sc4.west)+(4mm,1.5mm)$) {molecule};
+\node[scene-tag,anchor=west] at ($(sc4.west)+(4mm,-2mm)$) {分子 · 键几何};
+
+% --- Row 2 (y ≈ 15.35) ---
+% city
+\node[scene-cell] (sc5) at (2.2, 15.35) {};
+\node[color-dot,fill=C5,anchor=west] at (sc5.west) {};
+\node[scene-id,anchor=west] at ($(sc5.west)+(4mm,1.5mm)$) {city};
+\node[scene-tag,anchor=west] at ($(sc5.west)+(4mm,-2mm)$) {空间系统 · 城市密度};
+
+% globe
+\node[scene-cell] (sc6) at (6.6, 15.35) {};
+\node[color-dot,fill=C6,anchor=west] at (sc6.west) {};
+\node[scene-id,anchor=west] at ($(sc6.west)+(4mm,1.5mm)$) {globe};
+\node[scene-tag,anchor=west] at ($(sc6.west)+(4mm,-2mm)$) {地理空间 · 透明球};
+
+% ribbons
+\node[scene-cell] (sc7) at (11.0, 15.35) {};
+\node[color-dot,fill=C1,anchor=west] at (sc7.west) {};
+\node[scene-id,anchor=west] at ($(sc7.west)+(4mm,1.5mm)$) {ribbons};
+\node[scene-tag,anchor=west] at ($(sc7.west)+(4mm,-2mm)$) {流场 · 分层带状};
+
+% lattice
+\node[scene-cell] (sc8) at (15.4, 15.35) {};
+\node[color-dot,fill=C2,anchor=west] at (sc8.west) {};
+\node[scene-id,anchor=west] at ($(sc8.west)+(4mm,1.5mm)$) {lattice};
+\node[scene-tag,anchor=west] at ($(sc8.west)+(4mm,-2mm)$) {材料科学 · 晶胞};
+
+% --- Row 3 (y ≈ 13.95) ---
+% vectors
+\node[scene-cell] (sc9) at (2.2, 13.95) {};
+\node[color-dot,fill=C3,anchor=west] at (sc9.west) {};
+\node[scene-id,anchor=west] at ($(sc9.west)+(4mm,1.5mm)$) {vectors};
+\node[scene-tag,anchor=west] at ($(sc9.west)+(4mm,-2mm)$) {科学字形 · 方向场};
+
+% knots
+\node[scene-cell] (sc10) at (6.6, 13.95) {};
+\node[color-dot,fill=C4,anchor=west] at (sc10.west) {};
+\node[scene-id,anchor=west] at ($(sc10.west)+(4mm,1.5mm)$) {knots};
+\node[scene-tag,anchor=west] at ($(sc10.west)+(4mm,-2mm)$) {拓扑 · 纽结族对比};
+
+% particles
+\node[scene-cell] (sc11) at (11.0, 13.95) {};
+\node[color-dot,fill=C5,anchor=west] at (sc11.west) {};
+\node[scene-id,anchor=west] at ($(sc11.west)+(4mm,1.5mm)$) {particles};
+\node[scene-tag,anchor=west] at ($(sc11.west)+(4mm,-2mm)$) {粒子系统 · 密度壳};
+
+% metaballs
+\node[scene-cell] (sc12) at (15.4, 13.95) {};
+\node[color-dot,fill=C6,anchor=west] at (sc12.west) {};
+\node[scene-id,anchor=west] at ($(sc12.west)+(4mm,1.5mm)$) {metaballs};
+\node[scene-tag,anchor=west] at ($(sc12.west)+(4mm,-2mm)$) {隐式曲面 · 有机融合};
+
+% 场景网格下方统计行
+\node[note,anchor=north west] at (0, 13.55)
+  {全部 12 场景 · 复杂度均为 advanced · 覆盖天文、科学曲面、生成雕塑、分子、空间系统、地理空间、流场、材料科学、科学字形、拓扑、粒子系统、隐式曲面等族类};
+
+% 分隔
+\draw[boundary] (0,12.95) -- (18,12.95);
+
+% ══════════════════════════════════════════════════════════════════════════
+% PANEL 2: 渲染管线
+% ══════════════════════════════════════════════════════════════════════════
+\node[kicker,anchor=west] at (0,12.75) {02 · 渲染管线};
+\node[anchor=west,font=\rmfamily\large\bfseries,text=Ink]
+  at (0,12.15) {从目录定义到透明画布输出};
+
+% 5 个阶段的丝带路径
+% catalog.json → TypeScript/Vite → Three.js WebGL → Canvas → Playwright 截图
+
+\node[stage] (p1) at (1.6, 10.85) {01};
+\node[stage] (p2) at (5.4, 10.85) {02};
+\node[stage] (p3) at (9.2, 10.85) {03};
+\node[stage] (p4) at (12.8, 10.85) {04};
+\node[stage] (p5) at (16.4, 10.85) {05};
+
+\node[stage label,anchor=south] at (1.6, 11.40) {catalog.json};
+\node[stage label,anchor=south] at (5.4, 11.40) {TypeScript + Vite};
+\node[stage label,anchor=south] at (9.2, 11.40) {Three.js WebGL};
+\node[stage label,anchor=south] at (12.8, 11.40) {透明 Canvas};
+\node[stage label,anchor=south] at (16.4, 11.40) {PNG 输出};
+
+\node[note,anchor=north,align=center,text width=22mm] at (1.6, 10.25)
+  {场景元数据\\id · family · complexity};
+\node[note,anchor=north,align=center,text width=26mm] at (5.4, 10.25)
+  {12 个渲染函数\\main.ts 统一入口};
+\node[note,anchor=north,align=center,text width=28mm] at (9.2, 10.25)
+  {alpha:true, ACES\\tone mapping};
+\node[note,anchor=north,align=center,text width=28mm] at (12.8, 10.30)
+  {1400×900\\\scriptsize 保留绘制缓冲};
+\node[note,anchor=north,align=center,text width=26mm] at (16.4, 10.25)
+  {omitBackground\\透明 PNG};
+
+% 丝带
+\begin{pgfonlayer}{edge layer}
+  \draw[spine] (p1) -- (p2);
+  \draw[spine] (p2) -- (p3);
+  \draw[spine] (p3) -- (p4);
+  \draw[spine] (p4) -- (p5);
+\end{pgfonlayer}
+
+% 上方系统框: Vite dev server 和 Playwright browser
+\node[system] (vite) at (5.4, 8.70) {Vite Dev Server};
+\node[system] (browser) at (12.8, 8.70) {Playwright · Chrome};
+
+% 调用关系
+\begin{pgfonlayer}{edge layer}
+  \draw[call] (p2.south) -- (vite.north);
+  \draw[reply] (vite.north east) -- ($(p2.south)+(2mm,0)$);
+  \draw[call] (p4.south) -- (browser.north);
+  \draw[reply] (browser.north west) -- ($(p4.south)+(-2mm,0)$);
+\end{pgfonlayer}
+
+\node[edge label,anchor=west] at (5.95, 9.55) {HTTP};
+\node[edge label,anchor=west] at (14.50, 8.70) {页面加载};
+
+% 分隔
+\draw[boundary] (0,7.95) -- (18,7.95);
+
+% ══════════════════════════════════════════════════════════════════════════
+% PANEL 3: 验证闭环
+% ══════════════════════════════════════════════════════════════════════════
+\node[kicker,anchor=west] at (0,7.55) {03 · 验证闭环};
+\node[anchor=west,font=\rmfamily\large\bfseries,text=Ink]
+  at (0,6.95) {像素级质量保证 · 四项闸门};
+
+% 四个验证徽章 (2x2)
+\node[check-badge] (v-alpha) at (3.8, 5.90)
+  {\textbf{Alpha 阈值}\\[1mm]\scriptsize transparent $>$ 8\%};
+\node[check-badge] (v-visible) at (9.0, 5.90)
+  {\textbf{可见密度}\\[1mm]\scriptsize visible $>$ 3.5\%};
+\node[check-badge] (v-color) at (14.2, 5.90)
+  {\textbf{色彩丰富度}\\[1mm]\scriptsize colorful $>$ 2500};
+\node[check-badge] (v-interact) at (3.8, 4.30)
+  {\textbf{交互契约}\\[1mm]\scriptsize pointermove 计数递增};
+\node[check-badge] (v-network) at (9.0, 4.30)
+  {\textbf{网络隔离}\\[1mm]\scriptsize 仅允许 localhost/data:};
+\node[check-badge] (v-error) at (14.2, 4.30)
+  {\textbf{零控制台错误}\\[1mm]\scriptsize page error + console error};
+
+% 说明
+\node[note,anchor=north west,text width=90mm] at (0, 3.40)
+  {capture.mjs 使用 pngjs 逐像素校验 RGBA，Playwright 同时验证交互事件与网络隔离。};
+
+% 分隔
+\draw[boundary] (0,2.95) -- (18,2.95);
+
+% ══════════════════════════════════════════════════════════════════════════
+% PANEL 4: 技术栈 + 文件结构
+% ══════════════════════════════════════════════════════════════════════════
+\node[kicker,anchor=west] at (0,2.40) {04 · 技术栈与结构};
+
+% 技术栈 pills
+\node[tech-pill,anchor=west] at (0, 1.75) {three 0.180};
+\node[tech-pill,anchor=west] at (2.6, 1.75) {TypeScript 5.9};
+\node[tech-pill,anchor=west] at (5.6, 1.75) {Vite 8.2};
+\node[tech-pill,anchor=west] at (7.8, 1.75) {Playwright};
+\node[tech-pill,anchor=west] at (10.6, 1.75) {pngjs};
+\node[tech-pill,anchor=west] at (12.6, 1.75) {OrbitControls};
+\node[tech-pill,anchor=west] at (15.6, 1.75) {WebGL2};
+
+% 底部: 文件结构
+\node[note,anchor=west] at (0, 1.0)
+  {\ttfamily\scriptsize catalog.json · main.ts · capture.mjs · out/*.png};
+
+% 右下角来源
+\node[note,anchor=east] at (18, 1.0)
+  {threejs-demos v0.2.0};
+
+\end{tikzpicture}
+\end{document}

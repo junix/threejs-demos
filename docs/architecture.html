@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>threejs-demos 架构文档</title>
+<style>
+:root{
+  --bg:#fafbfc;
+  --fg:#1a1d23;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --accent-soft:#dbeafe;
+  --teal:#0d9488;
+  --amber:#d97706;
+  --rose:#e11d48;
+  --violet:#7c3aed;
+  --emerald:#059669;
+  --sky:#0284c7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.7;font-size:16px}
+.container{max-width:1080px;margin:0 auto;padding:48px 32px 96px}
+h1{font-size:2.2rem;font-weight:700;margin:0 0 8px;letter-spacing:-.02em}
+h2{font-size:1.6rem;font-weight:700;margin:56px 0 16px;letter-spacing:-.01em;padding-bottom:8px;border-bottom:2px solid var(--line)}
+h3{font-size:1.15rem;font-weight:600;margin:24px 0 10px}
+p{margin:0 0 14px;color:#374151}
+.lead{font-size:1.1rem;color:var(--muted);max-width:720px}
+.tagline{font-family:"JetBrains Mono",Menlo,Consolas,monospace;font-size:.85em;background:#eef2ff;color:#3730a3;padding:2px 6px;border-radius:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:16px 0}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0}
+.feat-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:.92rem}
+.feat-item strong{display:block;margin-bottom:4px;color:var(--fg)}
+.feat-item span{color:var(--muted);font-size:.85rem}
+.diagram-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 20px;margin:20px 0;overflow:hidden}
+.diagram-title{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:12px}
+svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.prose{max-width:780px}
+.prose p{margin:0 0 14px}
+.wt-step{display:flex;gap:16px;padding:14px 18px;background:#f8fafc;border-left:3px solid var(--accent);margin:10px 0;border-radius:0 8px 8px 0}
+.wt-step .num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.wt-step .wt-body{flex:1}
+.wt-step .wt-body strong{display:block;margin-bottom:2px}
+.wt-step .wt-body span{color:var(--muted);font-size:.9rem;color:#4b5563}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:.82rem;color:var(--muted)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-swatch{width:14px;height:14px;border-radius:3px;border:1px solid var(--line)}
+@media print{
+  body{background:#fff}
+  .container{padding:24px;max-width:none}
+  h2{page-break-after:avoid}
+  .diagram-wrap{break-inside:avoid}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
+.noscript-note{display:none;background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin:12px 0;color:#92400e;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>threejs-demos 架构文档</h1>
+  <p class="lead">一套由十二个精心构图的 WebGL 场景集合。透明 Alpha 渲染器 + 可复现的静态导出姿态，为视觉验证管线。面向科学可视化、生成雕塑与空间系统的速查参考库。</p>
+
+  <div class="noscript-note">当前浏览器未启用 JavaScript，架构图将以静态方式展示。</div>
+
+  <h2>产品概述</h2>
+  <div class="prose">
+    <p><code>threejs-demos</code> 是一个轻量级的 Three.js 场景演示集合。每个场景都是独立的纯前端可视化实验，覆盖天文轨道、地形、晶体、分子、城市、地球、飘带、晶格、向量场、纽结、粒子云、元球共十二个主题家族。每个场景均可通过 URL 查询参数 <code>?scene=&lt;id&gt;</code> 切换，所有场景共享同一套渲染器、相机、光照与交互控制系统。</p>
+    <p>项目的核心设计目标有两个：一是提供可即开即用的透明画布场景（Alpha 通道），便于嵌入到其他页面或设计稿中作为素材；二是可复现的导出姿态——每个场景加载后相机角度固定，配合自动化截图管线生成一致的输出，可用于回归测试。</p>
+  </div>
+
+  <h3>功能特性</h3>
+  <div class="feat-grid">
+    <div class="feat-item"><strong>12 个场景家族</strong><span>从天文到拓扑，覆盖多种可视化范式</span></div>
+    <div class="feat-item"><strong>Alpha 透明渲染</strong><span>透明画布，可直接叠加到任意背景</span></div>
+    <div class="feat-item"><strong>可复现姿态</strong><span>静态相机角度，截图一致</span></div>
+    <div class="feat-item"><strong>OrbitControls 交互</strong><span>鼠标拖拽旋转、缩放查看</span></div>
+    <div class="feat-item"><strong>Playwright 自动化</strong><span>无头浏览器截图 + 像素校验</span></div>
+    <div class="feat-item"><strong>TypeScript 类型</strong><span>完整类型检查，零运行时开销</span></div>
+    <div class="feat-item"><strong>Vite 构建</strong><span>极速开发 + 体验与生产构建</span></div>
+    <div class="feat-item"><strong>目录元数据</strong><span>catalog.json 记录用途、复杂度、标签</span></div>
+  </div>
+
+  <h2>系统分层架构</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-title">图 1 · 系统分层架构</div>
+    <svg id="layerSvg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="系统分层架构图">
+      <defs>
+      <linearGradient id="grad-browser" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#eff6ff"/>
+        <stop offset="100%" stop-color="#dbeafe"/>
+      </linearGradient>
+      <linearGradient id="grad-scene" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f0fdf4"/>
+        <stop offset="100%" stop-color="#dcfce7"/>
+      </linearGradient>
+      <linearGradient id="grad-build" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#faf5ff"/>
+        <stop offset="100%" stop-color="#f3e8ff"/>
+      </linearGradient>
+      <linearGradient id="grad-pipeline" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff7ed"/>
+        <stop offset="100%" stop-color="#ffedd5"/>
+      </linearGradient>
+      <linearGradient id="grad-catalog" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fef2f2"/>
+        <stop offset="100%" stop-color="#ffe4e6"/>
+      </linearGradient>
+      <linearGradient id="grad-output" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ecfeff"/>
+        <stop offset="100%" stop-color="#cffafe"/>
+      </linearGradient>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+      </marker>
+      </defs>
+
+      <!-- Layer 1: Browser Runtime -->
+      <g class="layer layer-browser" data-layer="browser">
+        <rect x="60" y="30" width="780" height="68" rx="10" fill="url(#grad-browser)" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="82" y="54" font-size="13" font-weight="700" fill="#1e40af">浏览器运行时层</text>
+        <g transform="translate(200,42)">
+          <rect x="0" y="0" width="110" height="44" rx="6" fill="#fff" stroke="#60a5fa" stroke-width="1.2"/>
+          <text x="55" y="20" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a8a">index.html</text>
+          <text x="55" y="34" text-anchor="middle" font-size="9" fill="#3b82f6">入口 HTML</text>
+        </g>
+        <g transform="translate(340,42)">
+          <rect x="0" y="0" width="130" height="44" rx="6" fill="#fff" stroke="#60a5fa" stroke-width="1.2"/>
+          <text x="65" y="20" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a8a">main.ts</text>
+          <text x="65" y="34" text-anchor="middle" font-size="9" fill="#3b82f6">场景调度 + 渲染循环</text>
+        </g>
+        <g transform="translate(510,42)">
+          <rect x="0" y="0" width="150" height="44" rx="6" fill="#fff" stroke="#60a5fa" stroke-width="1.2"/>
+          <text x="75" y="20" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a8a">Three.js 内核</text>
+          <text x="75" y="34" text-anchor="middle" font-size="9" fill="#3b82f6">Renderer/Scene/Camera</text>
+        </g>
+        <g transform="translate(700,42)">
+          <rect x="0" y="0" width="120" height="44" rx="6" fill="#fff" stroke="#60a5fa" stroke-width="1.2"/>
+          <text x="60" y="20" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a8a">OrbitControls</text>
+          <text x="60" y="34" text-anchor="middle" font-size="9" fill="#3b82f6">交互控制</text>
+        </g>
+      </g>
+
+      <!-- Layer 2: Scene Family -->
+      <g class="layer layer-scene" data-layer="scene">
+        <rect x="60" y="118" width="780" height="82" rx="10" fill="url(#grad-scene)" stroke="#86efac" stroke-width="1.5"/>
+        <text x="82" y="142" font-size="13" font-weight="700" fill="#166534">场景家族层</text>
+        <g transform="translate(200,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">orbital</text>
+        </g>
+        <g transform="translate(282,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">terrain</text>
+        </g>
+        <g transform="translate(364,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">crystal</text>
+        </g>
+        <g transform="translate(446,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">molecule</text>
+        </g>
+        <g transform="translate(528,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">city</text>
+        </g>
+        <g transform="translate(610,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">globe</text>
+        </g>
+        <g transform="translate(692,130)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">ribbons</text>
+        </g>
+        <g transform="translate(200,168)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">lattice</text>
+        </g>
+        <g transform="translate(282,168)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">vectors</text>
+        </g>
+        <g transform="translate(364,168)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">knots</text>
+        </g>
+        <g transform="translate(446,168)">
+          <rect x="0" y="0" width="72" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="36" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">particles</text>
+        </g>
+        <g transform="translate(528,168)">
+          <rect x="0" y="0" width="86" height="30" rx="5" fill="#fff" stroke="#4ade80" stroke-width="1.2"/>
+          <text x="43" y="19" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">metaballs</text>
+        </g>
+        <text x="650" y="188" font-size="10" fill="#166534">共 12 个场景函数</text>
+      </g>
+
+      <!-- Layer 3: Build Toolchain -->
+      <g class="layer layer-build" data-layer="build">
+        <rect x="60" y="220" width="780" height="62" rx="10" fill="url(#grad-build)" stroke="#c4b5fd" stroke-width="1.5"/>
+        <text x="82" y="244" font-size="13" font-weight="700" fill="#5b21b6">构建工具链层</text>
+        <g transform="translate(260,232)">
+          <rect x="0" y="0" width="100" height="38" rx="6" fill="#fff" stroke="#a78bfa" stroke-width="1.2"/>
+          <text x="50" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">Vite</text>
+          <text x="50" y="30" text-anchor="middle" font-size="9" fill="#7c3aed">Dev/Build</text>
+        </g>
+        <g transform="translate(390,232)">
+          <rect x="0" y="0" width="120" height="38" rx="6" fill="#fff" stroke="#a78bfa" stroke-width="1.2"/>
+          <text x="60" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">TypeScript</text>
+          <text x="60" y="30" text-anchor="middle" font-size="9" fill="#7c3aed">类型检查</text>
+        </g>
+        <g transform="translate(550,232)">
+          <rect x="0" y="0" width="130" height="38" rx="6" fill="#fff" stroke="#a78bfa" stroke-width="1.2"/>
+          <text x="65" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">package.json</text>
+          <text x="65" y="30" text-anchor="middle" font-size="9" fill="#7c3aed">脚本与依赖</text>
+        </g>
+      </g>
+
+      <!-- Layer 4: Render/Test Pipeline -->
+      <g class="layer layer-pipeline" data-layer="pipeline">
+        <rect x="60" y="302" width="780" height="62" rx="10" fill="url(#grad-pipeline)" stroke="#fdba74" stroke-width="1.5"/>
+        <text x="82" y="326" font-size="13" font-weight="700" fill="#92400e">渲染测试管线层</text>
+        <g transform="translate(240,314)">
+          <rect x="0" y="0" width="110" height="38" rx="6" fill="#fff" stroke="#fb923c" stroke-width="1.2"/>
+          <text x="55" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#9a3412">capture.mjs</text>
+          <text x="55" y="30" text-anchor="middle" font-size="9" fill="#ea580c">主控脚本</text>
+        </g>
+        <g transform="translate(380,314)">
+          <rect x="0" y="0" width="120" height="38" rx="6" fill="#fff" stroke="#fb923c" stroke-width="1.2"/>
+          <text x="60" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#9a3412">Playwright</text>
+          <text x="60" y="30" text-anchor="middle" font-size="9" fill="#ea580c">无头浏览器</text>
+        </g>
+        <g transform="translate(530,314)">
+          <rect x="0" y="0" width="100" height="38" rx="6" fill="#fff" stroke="#fb923c" stroke-width="1.2"/>
+          <text x="50" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#9a3412">pngjs</text>
+          <text x="50" y="30" text-anchor="middle" font-size="9" fill="#ea580c">像素校验</text>
+        </g>
+        <g transform="translate(660,314)">
+          <rect x="0" y="0" width="100" height="38" rx="6" fill="#fff" stroke="#fb923c" stroke-width="1.2"/>
+          <text x="50" y="17" text-anchor="middle" font-size="11" font-weight="600" fill="#9a3412">Chrome</text>
+          <text x="50" y="30" text-anchor="middle" font-size="9" fill="#ea580c">SwiftShader</text>
+        </g>
+      </g>
+
+      <!-- Layer 5: Catalog Metadata -->
+      <g class="layer layer-catalog" data-layer="catalog">
+        <rect x="60" y="384" width="780" height="52" rx="10" fill="url(#grad-catalog)" stroke="#fda4af" stroke-width="1.5"/>
+        <text x="82" y="408" font-size="13" font-weight="700" fill="#9f1239">目录元数据层</text>
+        <g transform="translate(260,390)">
+          <rect x="0" y="0" width="140" height="40" rx="6" fill="#fff" stroke="#fb7185" stroke-width="1.2"/>
+          <text x="70" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#9f1239">catalog.json</text>
+          <text x="70" y="31" text-anchor="middle" font-size="9" fill="#e11d48">用途/复杂度/标签</text>
+        </g>
+        <text x="440" y="414" font-size="10" fill="#9f1239">每个场景一条记录，驱动测试管线与文档索引</text>
+      </g>
+
+      <!-- Layer 6: Output Artifacts -->
+      <g class="layer layer-output" data-layer="output">
+        <rect x="60" y="456" width="780" height="52" rx="10" fill="url(#grad-output)" stroke="#67e8f9" stroke-width="1.5"/>
+        <text x="82" y="480" font-size="13" font-weight="700" fill="#0e7490">输出产物层</text>
+        <g transform="translate(260,462)">
+          <rect x="0" y="0" width="120" height="40" rx="6" fill="#fff" stroke="#22d3ee" stroke-width="1.2"/>
+          <text x="60" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">out/*.png</text>
+          <text x="60" y="31" text-anchor="middle" font-size="9" fill="#06b6d4">透明 PNG 截图</text>
+        </g>
+        <g transform="translate(420,462)">
+          <rect x="0" y="0" width="120" height="40" rx="6" fill="#fff" stroke="#22d3ee" stroke-width="1.2"/>
+          <text x="60" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">dist/</text>
+          <text x="60" y="31" text-anchor="middle" font-size="9" fill="#06b6d4">构建产物</text>
+        </g>
+        <g transform="translate(580,462)">
+          <rect x="0" y="0" width="140" height="40" rx="6" fill="#fff" stroke="#22d3ee" stroke-width="1.2"/>
+          <text x="70" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">报告日志</text>
+          <text x="70" y="31" text-anchor="middle" font-size="9" fill="#06b6d4">像素统计/透明率</text>
+        </g>
+      </g>
+
+      <!-- Connecting arrows -->
+      <g class="arrows" stroke="#6b7280" stroke-width="1.2" fill="none" marker-end="url(#arrow)">
+        <path d="M 450 98 L 450 118"/>
+        <path d="M 450 200 L 450 220"/>
+        <path d="M 450 282 L 450 302"/>
+        <path d="M 450 364 L 450 384"/>
+        <path d="M 450 436 L 450 456"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="prose">
+    <p>系统从上到下分为六层，自上而下为：浏览器运行时、场景家族、构建工具链、渲染测试管线、目录元数据、输出产物。各层职责单一，依赖方向自上而下调用，下层为上层提供能力。</p>
+    <p><strong>浏览器运行时层</strong>负责在浏览器中加载并运行场景。<code>index.html</code> 是入口，<code>main.ts</code> 解析 URL 参数、创建 Three.js 渲染器、场景、相机与光照，然后调用对应场景函数填充场景内容，最后启动渲染循环并挂载 OrbitControls 交互。</p>
+    <p><strong>场景家族层</strong>是项目的核心内容层。十二个独立的场景函数（<code>orbital</code>、<code>terrain</code>、<code>crystal</code>、<code>molecule</code>、<code>city</code>、<code>globe</code>、<code>ribbons</code>、<code>lattice</code>、<code>vectors</code>、<code>knots</code>、<code>particles</code>、<code>metaballs</code>）各自向同一个 <code>root</code> 组中添加几何体与材质。每个函数遵循相同约定：不接收参数，直接操作共享的根节点，完成后返回。</p>
+    <p><strong>构建工具链层</strong>使用 Vite 作为开发服务器与生产构建工具，TypeScript 提供静态类型检查。<code>package.json</code> 中定义了 <code>dev</code>、<code>build</code>、<code>render</code>、<code>test</code> 等标准脚本。</p>
+    <p><strong>渲染测试管线层</strong>是本项目的关键特色。<code>capture.mjs</code> 脚本驱动 Playwright 启动 Chrome（SwiftShader 软渲染），依次访问每个场景，等待 <code>__VIS_READY__</code> 标志后截取透明背景 PNG，再用 pngjs 逐像素校验透明度、可见像素、彩色像素三项阈值，确保画面质量达标。</p>
+    <p><strong>目录元数据层</strong>的 <code>catalog.json</code> 记录了每个场景的用途、所属家族、设计问题、复杂度与标签。它既是测试管线的输入（决定了要渲染哪些场景），也是文档索引的数据源。</p>
+    <p><strong>输出产物层</strong>包含构建后的静态资源（<code>dist/</code>）、导出的透明 PNG（<code>out/</code>）以及像素统计报告。</p>
+  </div>
+
+  <h2>主走查：渲染出图</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-title">图 2 · 端到端渲染出图流程</div>
+    <svg id="walkSvg" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="渲染出图走查">
+      <defs>
+        <linearGradient id="wtgrad1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#60a5fa"/>
+          <stop offset="100%" stop-color="#a78bfa"/>
+        </linearGradient>
+        <marker id="wtarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+        </marker>
+      </defs>
+
+      <!-- Step 1: catalog.json -->
+      <g class="wt-node" data-step="1">
+        <rect x="40" y="40" width="140" height="80" rx="10" fill="#fef2f2" stroke="#f87171" stroke-width="2"/>
+        <text x="110" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b">1. 读取目录</text>
+        <text x="110" y="86" text-anchor="middle" font-size="10" fill="#b91c1c">catalog.json</text>
+        <text x="110" y="102" text-anchor="middle" font-size="9" fill="#dc2626">解析 12 个场景</text>
+      </g>
+
+      <!-- Arrow 1 -> 2 -->
+      <path d="M 180 80 L 260 80" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Step 2: Vite build & serve -->
+      <g class="wt-node" data-step="2">
+        <rect x="260" y="40" width="160" height="80" rx="10" fill="#faf5ff" stroke="#a78bfa" stroke-width="2"/>
+        <text x="340" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">2. 构建启动</text>
+        <text x="340" y="86" text-anchor="middle" font-size="10" fill="#6d28d9">Vite build + serve</text>
+        <text x="340" y="102" text-anchor="middle" font-size="9" fill="#7c3aed">本地 HTTP 服务</text>
+      </g>
+
+      <!-- Arrow 2 -> 3 -->
+      <path d="M 420 80 L 490 80" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Step 3: Playwright + Chrome -->
+      <g class="wt-node" data-step="3">
+        <rect x="490" y="40" width="170" height="80" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+        <text x="575" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#9a3412">3. 浏览器渲染</text>
+        <text x="575" y="86" text-anchor="middle" font-size="10" fill="#c2410c">Playwright + Chrome</text>
+        <text x="575" y="102" text-anchor="middle" font-size="9" fill="#ea580c">SwiftShader 软渲染</text>
+      </g>
+
+      <!-- Arrow 3 -> 4 -->
+      <path d="M 660 80 L 730 80" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Step 4: Screenshot -->
+      <g class="wt-node" data-step="4">
+        <rect x="730" y="40" width="130" height="80" rx="10" fill="#ecfeff" stroke="#22d3ee" stroke-width="2"/>
+        <text x="795" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#0e7490">4. 截图导出</text>
+        <text x="795" y="86" text-anchor="middle" font-size="10" fill="#0891b2">透明 PNG</text>
+        <text x="795" y="102" text-anchor="middle" font-size="9" fill="#06b6d4">omitBackground</text>
+      </g>
+
+      <!-- Step 5: Interaction test -->
+      <g class="wt-node" data-step="5">
+        <rect x="40" y="180" width="170" height="80" rx="10" fill="#f0fdf4" stroke="#4ade80" stroke-width="2"/>
+        <text x="125" y="208" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">5. 交互验证</text>
+        <text x="125" y="226" text-anchor="middle" font-size="10" fill="#15803d">鼠标事件触发计数</text>
+        <text x="125" y="242" text-anchor="middle" font-size="9" fill="#16a34a">__INTERACTION_COUNT__</text>
+      </g>
+
+      <!-- Arrow 4 -> 5 (down then left) -->
+      <path d="M 795 120 L 795 220 L 210 220" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Step 6: Pixel validation -->
+      <g class="wt-node" data-step="6">
+        <rect x="260" y="180" width="170" height="80" rx="10" fill="#fef9c3" stroke="#facc15" stroke-width="2"/>
+        <text x="345" y="208" text-anchor="middle" font-size="12" font-weight="700" fill="#854d0e">6. 像素校验</text>
+        <text x="345" y="226" text-anchor="middle" font-size="10" fill="#a16207">pngjs 逐像素分析</text>
+        <text x="345" y="242" text-anchor="middle" font-size="9" fill="#ca8a04">透明/可见/彩色</text>
+      </g>
+
+      <!-- Arrow 5 -> 6 -->
+      <path d="M 210 220 L 260 220" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Step 7: out/ output -->
+      <g class="wt-node" data-step="7">
+        <rect x="490" y="180" width="170" height="80" rx="10" fill="#fdf4ff" stroke="#e879f9" stroke-width="2"/>
+        <text x="575" y="208" text-anchor="middle" font-size="12" font-weight="700" fill="#86198f">7. 产物输出</text>
+        <text x="575" y="226" text-anchor="middle" font-size="10" fill="#a21caf">out/*.png + 报告</text>
+        <text x="575" y="242" text-anchor="middle" font-size="9" fill="#c026d3">12 张透明图</text>
+      </g>
+
+      <!-- Arrow 6 -> 7 -->
+      <path d="M 430 220 L 490 220" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#wtarrow)"/>
+
+      <!-- Loop back to 1 (loop arrow) -->
+      <path d="M 660 220 L 730 220 L 795 220 L 795 300 L 110 300 L 110 120" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#wtarrow)"/>
+      <text x="450" y="322" text-anchor="middle" font-size="10" fill="#6b7280">逐个场景循环（12 次）</text>
+
+    </svg>
+  </div>
+
+  <div class="wt-step">
+    <div class="wt-stepnum">1</div>
+    <div class="wt-body">
+      <strong>读取目录元数据</strong>
+      <span><code>capture.mjs</code> 读取 <code>catalog.json</code>，拿到 12 个场景的 ID 列表。若场景数量校验：若不足 12 个直接报错，确保参考库完整。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">2</div>
+    <div class="wt-body">
+      <strong>启动 Vite 开发服务器</strong>
+      <span>用子进程启动 Vite，监听指定端口（默认 4173）。脚本通过 stdout 检测服务器就绪标志，超时则失败。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">3</div>
+    <div class="wt-body">
+      <strong>Playwright 驱动 Chrome 渲染场景</strong>
+      <span>启动 Chrome（SwiftShader 软渲染，禁外网），每个场景打开一个新页面，访问 <code>?scene=&lt;id&gt;</code>，等待 <code>window.__VIS_READY__</code> 为 true。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">4</div>
+    <div class="wt-body">
+      <strong>截取透明 PNG</strong>
+      <span>定位 <code>#stage</code> 画布元素截图，<code>omitBackground: true</code> 保留 Alpha 通道，输出到 <code>out/&lt;scene&gt;-transparent.png</code>。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">5</div>
+    <div class="wt-body">
+      <strong>交互契约验证</strong>
+      <span>模拟鼠标移动事件，检查 <code>__INTERACTION_COUNT__</code> 计数器递增，确保 OrbitControls 正常工作。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">6</div>
+    <div class="wt-body">
+      <strong>像素质量校验</strong>
+      <span>pngjs 逐像素统计：透明像素占比 &gt; 8%、可见像素 &gt; 3.5%、彩色像素 &gt; 2500。三项均达标才算通过。</span>
+    </div>
+  </div>
+  <div class="wt-step">
+    <div class="wt-stepnum">7</div>
+    <div class="wt-body">
+      <strong>输出产物与报告</strong>
+      <span>12 张透明 PNG + 控制台打印每张的尺寸、透明率、可见率、彩色像素数。全部通过则测试通过。</span>
+    </div>
+  </div>
+
+  <h2>场景渲染管线</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-title">图 3 · 单场景内部渲染管线</div>
+    <svg id="sceneSvg" viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="场景渲染管线">
+      <defs>
+        <marker id="sarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+        </marker>
+      </defs>
+
+      <!-- URL params -->
+      <g class="snode" data-s="1">
+        <rect x="30" y="130" width="100" height="60" rx="8" fill="#f0f9ff" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="80" y="155" text-anchor="middle" font-size="11" font-weight="600" fill="#0c4a6e">URL 参数</text>
+        <text x="80" y="172" text-anchor="middle" font-size="9" fill="#0369a1">?scene=orbital</text>
+      </g>
+
+      <path d="M 130 160 L 190 160" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- main.ts entry -->
+      <g class="snode" data-s="2">
+        <rect x="190" y="120" width="120" height="80" rx="8" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="250" y="145" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a8a">main.ts 入口</text>
+        <text x="250" y="162" text-anchor="middle" font-size="9" fill="#2563eb">解析 scene 参数</text>
+        <text x="250" y="178" text-anchor="middle" font-size="9" fill="#2563eb">创建 canvas</text>
+      </g>
+
+      <path d="M 310 160 L 380 160" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- Renderer setup -->
+      <g class="snode" data-s="3">
+        <rect x="380" y="70" width="140" height="60" rx="8" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="450" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">WebGLRenderer</text>
+        <text x="450" y="112" text-anchor="middle" font-size="9" fill="#b45309">Alpha + ACES</text>
+      </g>
+
+      <path d="M 450 130 L 450 140" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- Scene + Camera + Lights -->
+      <g class="snode" data-s="4">
+        <rect x="380" y="150" width="140" height="80" rx="8" fill="#dcfce7" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="450" y="175" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Scene / Camera</text>
+        <text x="450" y="192" text-anchor="middle" font-size="9" fill="#15803d">PerspectiveCamera</text>
+        <text x="450" y="207" text-anchor="middle" font-size="9" fill="#15803d">Hemisphere +  3光灯</text>
+      </g>
+
+      <path d="M 520 190 L 580 190" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- Scene function -->
+      <g class="snode" data-s="5">
+        <rect x="580" y="120" width="130" height="140" rx="8" fill="#faf5ff" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="645" y="145" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">场景函数</text>
+        <text x="645" y="165" text-anchor="middle" font-size="9" fill="#6d28d9">orbital()</text>
+        <text x="645" y="180" text-anchor="middle" font-size="9" fill="#6d28d9">terrain()</text>
+        <text x="645" y="195" text-anchor="middle" font-size="9" fill="#6d28d9">crystal()...</text>
+        <text x="645" y="218" text-anchor="middle" font-size="9" fill="#7c3aed">向 root 添加网格</text>
+        <text x="645" y="233" text-anchor="middle" font-size="9" fill="#7c3aed">设置材质与变换</text>
+      </g>
+
+      <path d="M 450 230 L 450 250 L 645 250 L 645 260" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- OrbitControls -->
+      <g class="snode" data-s="6">
+        <rect x="580" y="280" width="130" height="50" rx="8" fill="#fdf2f8" stroke="#f472b6" stroke-width="1.5"/>
+        <text x="645" y="302" text-anchor="middle" font-size="11" font-weight="600" fill="#9d174d">OrbitControls</text>
+        <text x="645" y="318" text-anchor="middle" font-size="9" fill="#be185d">change 事件重绘</text>
+      </g>
+
+      <!-- Render loop -->
+      <g class="snode" data-s="7">
+        <rect x="760" y="150" width="110" height="80" rx="8" fill="#ecfeff" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="815" y="175" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">渲染循环</text>
+        <text x="815" y="192" text-anchor="middle" font-size="9" fill="#0891b2">renderer.render</text>
+        <text x="815" y="207" text-anchor="middle" font-size="9" fill="#0891b2">__VIS_READY__</text>
+      </g>
+
+      <path d="M 710 190 L 760 190" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+      <!-- Canvas output -->
+      <g class="snode" data-s="8">
+        <rect x="760" y="280" width="110" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="815" y="302" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Canvas 输出</text>
+        <text x="815" y="318" text-anchor="middle" font-size="9" fill="#15803d">1400×900 透明</text>
+      </g>
+
+      <path d="M 815 230 L 815 280" stroke="#6b7280" stroke-width="1.5" fill="none" marker-end="url(#sarrow)"/>
+
+    </svg>
+  </div>
+
+  <div class="prose">
+    <p>单个场景的渲染流程从 URL 参数解析开始，到画布输出结束，共经历以下阶段：</p>
+    <p><strong>参数解析阶段。</strong>页面加载时，<code>main.ts</code> 读取 <code>location.search</code> 中的 <code>scene</code> 参数，默认为 <code>orbital</code>。如果参数不匹配任何已知场景，回退到默认值。</p>
+    <p><strong>渲染器初始化阶段。</strong>创建 <code>WebGLRenderer</code>，开启 Alpha 透明通道、抗锯齿、 preserveDrawingBuffer（便于截图），设置 sRGB 色彩空间与 ACES 电影色调映射。</p>
+    <p><strong>场景与光照阶段。</strong>创建 <code>Scene</code>、<code>PerspectiveCamera</code>（36° 视场角），添加半球光 + 方向主光 + 点光源边缘光三点布光。相机初始位置和角度固定，确保每次加载即出图一致。</p>
+    <p><strong>场景构建阶段。</strong>调用对应场景函数（如 <code>orbital()</code>），函数内部创建几何体、材质、变换，全部挂到共享的 <code>root</code> 组上。每个场景函数都是纯构建器模式：不返回值，直接修改共享状态。</p>
+    <p><strong>交互与渲染阶段。</strong>挂载 <code>OrbitControls</code> 绑定到画布，监听 <code>change</code> 事件触发重绘。首帧渲染后设置 <code>window.__VIS_READY__ = true</code>，标志场景就绪，供测试管线等待。</p>
+  </div>
+
+  <h2>设计要点与约束</h2>
+  <div class="card">
+    <h3 style="margin-top:0">透明渲染约束</h3>
+    <p style="margin:0 0 8px">所有场景共享同一套渲染器配置（alpha: true、preserveDrawingBuffer: true、透明背景），确保输出 PNG 具备可用的 Alpha 通道。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">可复现姿态</h3>
+    <p style="margin:0 0 8px">相机初始位置与角度固定，场景函数不依赖随机数或时间，保证每次加载画面完全一致。这是自动化截图测试的基础。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">场景函数约定</h3>
+    <p style="margin:0 0 8px">每个场景函数都是零参数、无返回值，直接操作共享 root 组。这种统一接口让场景可以简单地按名称查找表调度，新增场景函数新增一个键值对映射。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">离线像素校验</h3>
+    <p style="margin:0 0 8px">使用 SwiftShader 软渲染 + 外网阻断，保证测试环境与机器一致，避免 GPU 差异导致的像素波动。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">单一入口单文件架构</h3>
+    <p style="margin:0 0 8px">所有 12 个场景在一个 <code>main.ts</code>，场景 demo 规模轻量，单文件管理更简单，场景间共享材质、颜色、工具函数也更方便。</p>
+  </div>
+
+  <h2>技术栈</h2>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#60a5fa"></span>Three.js 0.180</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#a78bfa"></span>TypeScript 5.9</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#fb923c"></span>Vite 8.2</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#4ade80"></span>Playwright 1.62</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#f472b6"></span>pngjs 7.0</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#facc15"></span>WebGL / Canvas</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // Animation:  // Animation for layer diagram: subtle float-in
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateLayers() {
+    const svg = document.getElementById('layerSvg');
+    if (!svg || prefersReduced) return;
+    const layers = svg.querySelectorAll('.layer');
+    layers.forEach((layer, i) => {
+      layer.style.opacity = '0';
+      layer.style.transform = 'translateY(12px)';
+      layer.style.transition = 'opacity .5s ease, transform .5s ease';
+      setTimeout(() => {
+        layer.style.opacity = '1';
+        layer.style.transform = 'translateY(0)';
+      }, 120 * i);
+    });
+    const arrows = svg.querySelectorAll('.arrows path');
+    arrows.forEach((arrow, i) => {
+      const len = arrow.getTotalLength();
+      arrow.style.strokeDasharray = len;
+      arrow.style.strokeDashoffset = len;
+      arrow.style.transition = 'stroke-dashoffset .6s ease';
+      setTimeout(() => {
+        arrow.style.strokeDashoffset = '0';
+      }, 700 + 150 * i);
+    });
+  }
+
+  function animateWalkthrough() {
+    const svg = document.getElementById('walkSvg');
+    if (!svg || prefersReduced) return;
+    const nodes = svg.querySelectorAll('.wt-node');
+    nodes.forEach((node, i) => {
+      node.style.opacity = '0';
+      node.style.transform = 'scale(.9)';
+      node.style.transition = 'opacity .4s ease, transform .4s ease';
+      setTimeout(() => {
+        node.style.opacity = '1';
+        node.style.transform = 'scale(1)';
+      }, 200 * i);
+    });
+  }
+
+  function animateScene() {
+    const svg = document.getElementById('sceneSvg');
+    if (!svg || prefersReduced) return;
+    const nodes = svg.querySelectorAll('.snode');
+    nodes.forEach((node, i) => {
+      node.style.opacity = '0';
+      node.style.transition = 'opacity .5s ease';
+      setTimeout(() => {
+        node.style.opacity = '1';
+      }, 150 * i);
+    });
+  }
+
+  // IntersectionObserver(')
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        if (id === 'layerSvg') animateLayers();
+        if (id === 'walkSvg') animateWalkthrough();
+        if (id === 'sceneSvg') animateScene();
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  ['layerSvg', 'walkSvg', 'sceneSvg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+
+  // Hover highlight for scene cards
+  document.querySelectorAll('.wt-node').forEach(node => {
+    node.style.cursor = 'pointer';
+    node.addEventListener('mouseenter', () => {
+      if (prefersReduced) return;
+      node.style.transform = 'translateY(-2px)';
+      node.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,.1))';
+      node.style.transition = 'transform .2s ease, filter .2s ease';
+    });
+    node.addEventListener('mouseleave', () => {
+      node.style.transform = '';
+      node.style.filter = '';
+    });
+  });
+})();
+</script>
+<noscript>
+<style>.noscript-note{display:block}</style>
+</noscript>
+</body>
+</html>

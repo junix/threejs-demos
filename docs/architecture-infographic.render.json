@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "project": "threejs-demos",
+  "title": "Three.js Demos 架构叙事信息图",
+  "language": "zh-CN",
+  "source_type": "tikz-xelatex",
+  "build_command": "xelatex -interaction=nonstopmode architecture-infographic.tex",
+  "svg_command": "pdf2svg architecture-infographic.pdf architecture-infographic.svg",
+  "png_command": "pdftoppm -r 150 -png architecture-infographic.pdf architecture-infographic",
+  "png_dpi": 150,
+  "backend": {
+    "tex_engine": "xelatex",
+    "tex_distribution": "TeX Live 2023",
+    "tikz_libraries": [
+      "arrows.meta",
+      "backgrounds",
+      "calc",
+      "fit",
+      "positioning",
+      "shapes.geometric",
+      "shapes.misc"
+    ],
+    "font_main": "Source Han Serif SC",
+    "font_mono": "Sarasa Mono SC",
+    "ctex": true
+  },
+  "narrative": {
+    "thesis": "12 精心构图的 WebGL 场景，通过透明渲染、Playwright 截图验证和目录驱动的架构，构成可复现的 Three.js 可视化参考库",
+    "reader_question": "这个项目如何组织？场景如何渲染和验证？",
+    "panels": [
+      {
+        "id": "header",
+        "title": "标题区",
+        "purpose": "项目定位与整体说明"
+      },
+      {
+        "id": "catalog",
+        "title": "01 场景目录",
+        "purpose": "12 个场景的 ID 与族类一览，4x3 网格布局，色点标识"
+      },
+      {
+        "id": "pipeline",
+        "title": "02 渲染管线",
+        "purpose": "从 catalog.json 到 PNG 输出的五步流水线，含 Vite 和 Playwright 两个外部系统"
+      },
+      {
+        "id": "validation",
+        "title": "03 验证闭环",
+        "purpose": "六项像素级与交互验证闸门（alpha 阈值、可见密度、色彩丰富度、交互契约、网络隔离、零错误）"
+      },
+      {
+        "id": "techstack",
+        "title": "04 技术栈与结构",
+        "purpose": "核心依赖版本与关键文件"
+      }
+    ]
+  },
+  "data_sources": [
+    {
+      "path": "../catalog.json",
+      "description": "场景元数据目录：12 个场景的 id/family/complexity/tags"
+    },
+    {
+      "path": "../package.json",
+      "description": "依赖版本：three 0.180.0, TypeScript 5.9.3, Vite 8.2.2, playwright-core 1.62.1"
+    },
+    {
+      "path": "../src/main.ts",
+      "description": "12 个场景渲染函数，统一 WebGL 渲染器配置（alpha:true, ACES tone mapping）"
+    },
+    {
+      "path": "../scripts/capture.mjs",
+      "description": "Playwright 截图脚本，SwiftShader WebGL，pngjs 像素级 RGBA 验证"
+    }
+  ],
+  "scene_count": 12,
+  "outputs": {
+    "tex": {
+      "file": "architecture-infographic.tex",
+      "size_bytes": 15832,
+      "sha256": "7ccce6761475b242349e4b42900579f733d2749e7e355691fe29139143df4a81"
+    },
+    "pdf": {
+      "file": "architecture-infographic.pdf",
+      "size_bytes": 84216,
+      "sha256": "5a2cd841d0a59f586d6e82f82dc396ec1b46e8e4095a9334b18dd61f5b1f3a49",
+      "width_pt": 556.82,
+      "height_pt": 599.34
+    },
+    "svg": {
+      "file": "architecture-infographic.svg",
+      "size_bytes": 651443,
+      "sha256": "df609b6347dc80ce2e553a9943bf818cac7393a9b8f9f0d00e166a9bc933d694"
+    },
+    "png": {
+      "file": "architecture-infographic.png",
+      "size_bytes": 255853,
+      "sha256": "5afaa3d32689d641028923a2bc825bc24bc682d4436b2a3548ed01c261c9d6ed",
+      "width_px": 1161,
+      "height_px": 1249
+    }
+  }
+}
