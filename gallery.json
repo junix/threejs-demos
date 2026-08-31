@@ -1,0 +1,8 @@
+{
+  "title": "threejs-demos",
+  "library": "three.js",
+  "tagline": "Twelve composed WebGL scenes exported through a true alpha renderer from a static, reproducible camera pose — orbital, terrain, crystal, molecular and lattice studies.",
+  "rebuild": "just build",
+  "backdrop": "dark",
+  "code_search": "src/main.ts"
+}

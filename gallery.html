@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>threejs-demos — gallery</title>
+<style>
+:root{
+  --bg:#fbfaf8; --panel:#fff; --ink:#16181d; --muted:#5f6570; --faint:#8b929e;
+  --line:#e3e1dc; --accent:#2f6f5e; --chip:#eef1ef; --code:#f6f5f2;
+  --shadow:0 1px 2px rgba(20,22,26,.05),0 8px 24px -12px rgba(20,22,26,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0f1114; --panel:#161a1f; --ink:#e8eaee; --muted:#a2abb8; --faint:#727d8c;
+  --line:#262c34; --accent:#6fd3b0; --chip:#1d232a; --code:#12161a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+}}
+:root[data-theme=dark]{
+  --bg:#0f1114; --panel:#161a1f; --ink:#e8eaee; --muted:#a2abb8; --faint:#727d8c;
+  --line:#262c34; --accent:#6fd3b0; --chip:#1d232a; --code:#12161a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:56px 28px 96px}
+header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:40px}
+h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:650}
+.tagline{margin:10px 0 0;color:var(--muted);max-width:70ch;font-size:16px}
+.meta{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
+  background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+.pill b{color:var(--ink);font-weight:600}
+.grid{display:grid;gap:26px;grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.shot{margin:0;padding:16px;display:flex;flex-direction:column;gap:10px;
+  align-items:center;justify-content:center;height:250px;border-bottom:1px solid var(--line)}
+.shot.tall{height:400px}
+.shot.checker{background-color:#f2f1ee;background-image:
+  linear-gradient(45deg,#e2e0dc 25%,transparent 25%,transparent 75%,#e2e0dc 75%),
+  linear-gradient(45deg,#e2e0dc 25%,transparent 25%,transparent 75%,#e2e0dc 75%);
+  background-size:16px 16px;background-position:0 0,8px 8px}
+.shot.dark{background:#11151a}
+.shot.light{background:#fff}
+.shot img,.shot video{max-width:100%;max-height:100%;width:auto;height:auto;
+  object-fit:contain;display:block;border-radius:3px}
+.shot.multi img{max-height:calc(50% - 5px)}
+.shot .missing{color:var(--faint);font-size:13px;font-style:italic;text-align:center}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.idx{font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--faint);
+  letter-spacing:.09em;text-transform:uppercase}
+h2{margin:0;font-size:17px;font-weight:620;letter-spacing:-.01em}
+.blurb{margin:0;color:var(--muted);font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.tag{font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
+  background:var(--chip);border-radius:5px;padding:4px 7px}
+details{margin-top:auto;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:var(--accent);list-style:none;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+details[open] summary::before{content:"▾ "}
+pre{margin:12px 0 0;background:var(--code);border:1px solid var(--line);border-radius:8px;
+  padding:14px;overflow-x:auto;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
+  max-height:440px;overflow-y:auto}
+pre .c{color:var(--faint);font-style:italic}
+pre .s{color:var(--accent)}
+pre .n{color:#b1784f}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) pre .n{color:#d8a06a}}
+:root[data-theme=dark] pre .n{color:#d8a06a}
+.extra{font:11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--faint)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--faint);font-size:13px}
+footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
+  font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>threejs-demos</h1>
+    <p class="tagline">Twelve composed WebGL scenes exported through a true alpha renderer from a static, reproducible camera pose — orbital, terrain, crystal, molecular and lattice studies.</p>
+    <div class="meta"><span class="pill">three.js</span><span class="pill"><b>12</b> demos</span><span class="pill"><b>12</b> rendered</span></div>
+  </header>
+  <main class="grid">
+      <article class="card">
+        <figure class="shot dark"><img src="out/orbital-transparent.png" alt="Orbital" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">01 · astronomical</div>
+          <h2>Orbital</h2>
+          <p class="blurb">How can a spatial instrument show nested orbital families?</p>
+          <div class="tags"><span class="tag">orbit</span><span class="tag">instrument</span><span class="tag">3d</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function orbital(){
+  for(let i=<span class="n">0</span>;i&lt;<span class="n">9</span>;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(<span class="n">1.1</span>+i*.<span class="n">29</span>,.<span class="n">012</span>+(i%<span class="n">3</span>)*.<span class="n">008</span>,<span class="n">10</span>,<span class="n">180</span>),new THREE.MeshBasicMaterial({color:colors[i%<span class="n">6</span>],transparent:true,opacity:.<span class="n">42</span>}));ring.rotation.x=Math.PI/<span class="n">2.4</span>+i*.<span class="n">045</span>;ring.rotation.y=-.<span class="n">35</span>+i*.<span class="n">08</span>;root.add(ring);const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.<span class="n">11</span>+(i%<span class="n">3</span>)*.<span class="n">045</span>,<span class="n">1</span>),material(colors[(i+<span class="n">2</span>)%<span class="n">6</span>]));const a=.<span class="n">72</span>+i*.<span class="n">84</span>;orb.position.set(Math.cos(a)*(<span class="n">1.1</span>+i*.<span class="n">29</span>),Math.sin(a)*.<span class="n">28</span>,Math.sin(a)*(<span class="n">1.1</span>+i*.<span class="n">29</span>));root.add(orb)}
+  const core=new THREE.Mesh(new THREE.IcosahedronGeometry(.<span class="n">9</span>,<span class="n">3</span>),material(<span class="n">0</span>xff9d66,.<span class="n">95</span>));core.scale.set(<span class="n">1</span>,<span class="n">1.12</span>,<span class="n">1</span>);root.add(core);root.rotation.x=.<span class="n">18</span>;root.rotation.z=-.<span class="n">1</span>;
+}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/terrain-transparent.png" alt="Terrain" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">02 · scientific surface</div>
+          <h2>Terrain</h2>
+          <p class="blurb">How can a spectral field become an explorable terrain?</p>
+          <div class="tags"><span class="tag">surface</span><span class="tag">wireframe</span><span class="tag">field</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function terrain(){
+  const n=<span class="n">74</span>,size=<span class="n">7.5</span>,geo=new THREE.PlaneGeometry(size,size,n-<span class="n">1</span>,n-<span class="n">1</span>);const pos=geo.attributes.position;const cols=[] as number[];
+  for(let i=<span class="n">0</span>;i&lt;pos.count;i++){const x=pos.getX(i),y=pos.getY(i),z=.<span class="n">52</span>*Math.sin(x*<span class="n">1.5</span>)*Math.cos(y*<span class="n">1.15</span>)+.<span class="n">24</span>*Math.sin((x+y)*<span class="n">3.1</span>)+.<span class="n">13</span>*Math.cos(Math.hypot(x,y)*<span class="n">5</span>);pos.setZ(i,z);const c=new THREE.Color().setHSL(.<span class="n">52</span>+.<span class="n">16</span>*(z+.<span class="n">8</span>)/<span class="n">1.6</span>,.<span class="n">75</span>,.<span class="n">48</span>+.<span class="n">18</span>*(z+.<span class="n">8</span>)/<span class="n">1.6</span>);cols.push(c.r,c.g,c.b)}geo.setAttribute(<span class="s">&#x27;color&#x27;</span>,new THREE.Float32BufferAttribute(cols,<span class="n">3</span>));geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({vertexColors:true,wireframe:false,metalness:.<span class="n">15</span>,roughness:.<span class="n">55</span>,transparent:true,opacity:.<span class="n">9</span>,side:THREE.DoubleSide}));mesh.rotation.x=-<span class="n">1.05</span>;mesh.rotation.z=-.<span class="n">28</span>;root.add(mesh);
+  const wire=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:<span class="n">0</span>xcbefff,wireframe:true,transparent:true,opacity:.<span class="n">12</span>}));wire.rotation.copy(mesh.rotation);wire.position.z=.<span class="n">015</span>;root.add(wire);
+}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/crystal-transparent.png" alt="Crystal" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">03 · generative sculpture</div>
+          <h2>Crystal</h2>
+          <p class="blurb">How can repeated polyhedra form a coherent crystal field?</p>
+          <div class="tags"><span class="tag">instancing</span><span class="tag">crystal</span><span class="tag">sculpture</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function crystal(){
+  const geo=new THREE.OctahedronGeometry(.<span class="n">31</span>,<span class="n">0</span>);for(let i=<span class="n">0</span>;i&lt;<span class="n">78</span>;i++){const mesh=new THREE.Mesh(geo,material(colors[i%<span class="n">6</span>],.<span class="n">66</span>));const a=i*<span class="n">2.399</span>,r=.<span class="n">4</span>+.<span class="n">052</span>*i;mesh.position.set(Math.cos(a)*r,(i%<span class="n">9</span>)*.<span class="n">16</span>-<span class="n">0.7</span>+Math.sin(i*.<span class="n">7</span>)*.<span class="n">25</span>,Math.sin(a)*r*.<span class="n">55</span>);mesh.rotation.set(i*.<span class="n">17</span>,i*.<span class="n">31</span>,i*.<span class="n">11</span>);const s=.<span class="n">45</span>+(i%<span class="n">7</span>)*.<span class="n">13</span>;mesh.scale.set(s,<span class="n">1.3</span>*s,s);root.add(mesh)}
+  const halo=new THREE.Mesh(new THREE.TorusKnotGeometry(<span class="n">2.15</span>,.<span class="n">035</span>,<span class="n">180</span>,<span class="n">10</span>,<span class="n">3</span>,<span class="n">7</span>),new THREE.MeshBasicMaterial({color:<span class="n">0</span>xa8deff,transparent:true,opacity:.<span class="n">34</span>}));halo.rotation.x=<span class="n">1.2</span>;root.add(halo);root.rotation.y=-.<span class="n">45</span>;
+}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/molecule-transparent.png" alt="Molecule" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">04 · molecular</div>
+          <h2>Molecule</h2>
+          <p class="blurb">How can bond geometry and atom classes remain legible in 3D?</p>
+          <div class="tags"><span class="tag">molecule</span><span class="tag">bonds</span><span class="tag">science</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function molecule(){const atoms=[[-<span class="n">2</span>,<span class="n">0</span>,<span class="n">0</span>,<span class="n">0</span>],[-<span class="n">1</span>,.<span class="n">6</span>,.<span class="n">2</span>,<span class="n">1</span>],[<span class="n">0</span>,<span class="n">0</span>,<span class="n">0</span>,<span class="n">2</span>],[<span class="n">1</span>,.<span class="n">7</span>,-.<span class="n">2</span>,<span class="n">0</span>],[<span class="n">2</span>,<span class="n">0</span>,.<span class="n">1</span>,<span class="n">3</span>],[<span class="n">0</span>,-<span class="n">1.2</span>,.<span class="n">5</span>,<span class="n">4</span>],[-<span class="n">1.8</span>,-<span class="n">1.1</span>,-.<span class="n">4</span>,<span class="n">2</span>],[<span class="n">1.8</span>,-<span class="n">1.2</span>,.<span class="n">3</span>,<span class="n">1</span>]] as const;const sphere=new THREE.SphereGeometry(.<span class="n">32</span>,<span class="n">28</span>,<span class="n">18</span>);atoms.forEach(([x,y,z,c],i)=&gt;{const a=new THREE.Mesh(sphere,material(colors[c],.<span class="n">9</span>));a.position.set(x,y,z);a.scale.setScalar(<span class="n">1</span>+(i%<span class="n">3</span>)*.<span class="n">22</span>);root.add(a);if(i){const prev=new THREE.Vector3(...atoms[i-<span class="n">1</span>].slice(<span class="n">0</span>,<span class="n">3</span>) as [number,number,number]),next=new THREE.Vector3(x,y,z),mid=prev.clone().add(next).multiplyScalar(.<span class="n">5</span>),len=prev.distanceTo(next);const bond=new THREE.Mesh(new THREE.CylinderGeometry(.<span class="n">055</span>,.<span class="n">055</span>,len,<span class="n">12</span>),material(<span class="n">0</span>xb8d8e8,.<span class="n">65</span>));bond.position.copy(mid);bond.quaternion.setFromUnitVectors(new THREE.Vector3(<span class="n">0</span>,<span class="n">1</span>,<span class="n">0</span>),next.clone().sub(prev).normalize());root.add(bond)}});root.rotation.set(.<span class="n">4</span>,-.<span class="n">4</span>,.<span class="n">12</span>)}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/city-transparent.png" alt="City" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">05 · spatial system</div>
+          <h2>City</h2>
+          <p class="blurb">How can urban density and circulation be expressed without a basemap?</p>
+          <div class="tags"><span class="tag">city</span><span class="tag">instancing</span><span class="tag">urban</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function city(){const geo=new THREE.BoxGeometry(.<span class="n">45</span>,<span class="n">1</span>,.<span class="n">45</span>);for(let x=-<span class="n">8</span>;x&lt;=<span class="n">8</span>;x++)for(let z=-<span class="n">5</span>;z&lt;=<span class="n">5</span>;z++){if((x+z)%<span class="n">4</span>===<span class="n">0</span>)continue;const h=.<span class="n">35</span>+((x*x*<span class="n">7</span>+z*z*<span class="n">11</span>+<span class="n">42</span>)%<span class="n">13</span>)*.<span class="n">16</span>,b=new THREE.Mesh(geo,material(colors[Math.abs(x+z)%<span class="n">6</span>],.<span class="n">64</span>));b.position.set(x*.<span class="n">55</span>,h/<span class="n">2</span>-<span class="n">1.8</span>,z*.<span class="n">58</span>);b.scale.y=h;root.add(b)}const ring=new THREE.Mesh(new THREE.TorusGeometry(<span class="n">3.6</span>,.<span class="n">045</span>,<span class="n">8</span>,<span class="n">140</span>),new THREE.MeshBasicMaterial({color:<span class="n">0</span>xff6f91,transparent:true,opacity:.<span class="n">8</span>}));ring.rotation.x=Math.PI/<span class="n">2</span>;ring.position.y=-<span class="n">1.4</span>;root.add(ring);root.rotation.y=-.<span class="n">48</span>}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/globe-transparent.png" alt="Globe" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">06 · geospatial</div>
+          <h2>Globe</h2>
+          <p class="blurb">How can routes and stations wrap a transparent globe?</p>
+          <div class="tags"><span class="tag">globe</span><span class="tag">routes</span><span class="tag">geospatial</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function globe(){const globe=new THREE.Mesh(new THREE.SphereGeometry(<span class="n">2.8</span>,<span class="n">48</span>,<span class="n">32</span>),new THREE.MeshPhysicalMaterial({color:<span class="n">0</span>x1a5272,transparent:true,opacity:.<span class="n">16</span>,roughness:.<span class="n">15</span>,transmission:.<span class="n">25</span>,wireframe:false}));root.add(globe);const wire=new THREE.Mesh(new THREE.SphereGeometry(<span class="n">2.83</span>,<span class="n">24</span>,<span class="n">16</span>),new THREE.MeshBasicMaterial({color:<span class="n">0</span>x75b9d5,wireframe:true,transparent:true,opacity:.<span class="n">14</span>}));root.add(wire);for(let i=<span class="n">0</span>;i&lt;<span class="n">18</span>;i++){const a=i*<span class="n">2.399</span>,y=-<span class="n">2.2</span>+(i%<span class="n">9</span>)*.<span class="n">55</span>,r=Math.sqrt(Math.max(<span class="n">0</span>,<span class="n">2.8</span>**<span class="n">2</span>-y**<span class="n">2</span>)),p=new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r);const dot=new THREE.Mesh(new THREE.SphereGeometry(.<span class="n">09</span>,<span class="n">12</span>,<span class="n">8</span>),material(colors[i%<span class="n">6</span>],.<span class="n">95</span>));dot.position.copy(p);root.add(dot);if(i&gt;<span class="n">1</span>){const q=root.children[root.children.length-<span class="n">3</span>] as THREE.Mesh;const curve=new THREE.QuadraticBezierCurve3(q.position.clone(),q.position.clone().add(p).normalize().multiplyScalar(<span class="n">4</span>),p);root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(<span class="n">40</span>)),new THREE.LineBasicMaterial({color:colors[i%<span class="n">6</span>],transparent:true,opacity:.<span class="n">35</span>})))}}root.rotation.y=-.<span class="n">5</span>}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/ribbons-transparent.png" alt="Ribbons" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">07 · flow field</div>
+          <h2>Ribbons</h2>
+          <p class="blurb">How can layered ribbons expose the structure of a vector flow?</p>
+          <div class="tags"><span class="tag">ribbon</span><span class="tag">flow</span><span class="tag">curve</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function ribbons(){for(let j=<span class="n">0</span>;j&lt;<span class="n">11</span>;j++){const pts=Array.from({length:<span class="n">90</span>},(_,i)=&gt;new THREE.Vector3((i-<span class="n">45</span>)*.<span class="n">095</span>,Math.sin(i*.<span class="n">18</span>+j*.<span class="n">7</span>)*.<span class="n">55</span>+(j-<span class="n">5</span>)*.<span class="n">16</span>,Math.cos(i*.<span class="n">12</span>+j)*.<span class="n">8</span>));const curve=new THREE.CatmullRomCurve3(pts),tube=new THREE.Mesh(new THREE.TubeGeometry(curve,<span class="n">180</span>,.<span class="n">035</span>+j%<span class="n">3</span>*.<span class="n">012</span>,<span class="n">8</span>,false),material(colors[j%<span class="n">6</span>],.<span class="n">62</span>));root.add(tube)}root.rotation.set(.<span class="n">35</span>,-.<span class="n">25</span>,.<span class="n">12</span>)}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/lattice-transparent.png" alt="Lattice" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">08 · material science</div>
+          <h2>Lattice</h2>
+          <p class="blurb">How do unit cells repeat into a readable lattice?</p>
+          <div class="tags"><span class="tag">lattice</span><span class="tag">instancing</span><span class="tag">materials</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function lattice(){const geo=new THREE.OctahedronGeometry(.<span class="n">12</span>,<span class="n">0</span>);for(let x=-<span class="n">4</span>;x&lt;=<span class="n">4</span>;x++)for(let y=-<span class="n">3</span>;y&lt;=<span class="n">3</span>;y++)for(let z=-<span class="n">2</span>;z&lt;=<span class="n">2</span>;z++){if((x+y+z)%<span class="n">2</span>)continue;const atom=new THREE.Mesh(geo,material(colors[(x*x+y*y+z*z)%<span class="n">6</span>],.<span class="n">78</span>));atom.position.set(x*.<span class="n">65</span>,y*.<span class="n">65</span>,z*.<span class="n">65</span>);atom.scale.setScalar(<span class="n">1.4</span>);root.add(atom)}const box=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(<span class="n">5.8</span>,<span class="n">4.5</span>,<span class="n">3.2</span>)),new THREE.LineBasicMaterial({color:<span class="n">0</span>x8ab5cc,transparent:true,opacity:.<span class="n">28</span>}));root.add(box);root.rotation.set(.<span class="n">55</span>,-.<span class="n">55</span>,.<span class="n">18</span>)}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/vectors-transparent.png" alt="Vectors" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">09 · scientific glyphs</div>
+          <h2>Vectors</h2>
+          <p class="blurb">How can directional glyphs encode a three-dimensional field?</p>
+          <div class="tags"><span class="tag">vectors</span><span class="tag">glyphs</span><span class="tag">field</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function vectors(){const cone=new THREE.ConeGeometry(.<span class="n">08</span>,.<span class="n">32</span>,<span class="n">10</span>);for(let x=-<span class="n">4</span>;x&lt;=<span class="n">4</span>;x++)for(let y=-<span class="n">3</span>;y&lt;=<span class="n">3</span>;y++)for(let z=-<span class="n">2</span>;z&lt;=<span class="n">2</span>;z++){if((x+y+z)%<span class="n">2</span>)continue;const v=new THREE.Vector3(-y*.<span class="n">18</span>,x*.<span class="n">2</span>,Math.sin((x+z)*.<span class="n">7</span>)*.<span class="n">35</span>),m=new THREE.Mesh(cone,material(colors[(x-y+<span class="n">12</span>)%<span class="n">6</span>],.<span class="n">72</span>));m.position.set(x*.<span class="n">62</span>,y*.<span class="n">62</span>,z*.<span class="n">7</span>);m.quaternion.setFromUnitVectors(new THREE.Vector3(<span class="n">0</span>,<span class="n">1</span>,<span class="n">0</span>),v.normalize());m.scale.y=.<span class="n">8</span>+v.length();root.add(m)}root.rotation.set(.<span class="n">35</span>,-.<span class="n">48</span>,.<span class="n">08</span>)}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/knots-transparent.png" alt="Knots" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">10 · topology</div>
+          <h2>Knots</h2>
+          <p class="blurb">How can several knot families be compared in one scene?</p>
+          <div class="tags"><span class="tag">knot</span><span class="tag">topology</span><span class="tag">curves</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function knots(){for(let j=<span class="n">0</span>;j&lt;<span class="n">5</span>;j++){const knot=new THREE.Mesh(new THREE.TorusKnotGeometry(<span class="n">1.05</span>+j*.<span class="n">18</span>,.<span class="n">045</span>+j*.<span class="n">008</span>,<span class="n">220</span>,<span class="n">10</span>,<span class="n">2</span>+j,<span class="n">3</span>+j%<span class="n">2</span>),material(colors[j],.<span class="n">66</span>));knot.position.x=(j-<span class="n">2</span>)*<span class="n">1.15</span>;knot.rotation.set(j*.<span class="n">28</span>,j*.<span class="n">42</span>,j*.<span class="n">12</span>);root.add(knot)}root.rotation.y=-.<span class="n">25</span>}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/particles-transparent.png" alt="Particles" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">11 · particle system</div>
+          <h2>Particles</h2>
+          <p class="blurb">How does a seeded particle shell reveal spatial density?</p>
+          <div class="tags"><span class="tag">particles</span><span class="tag">points</span><span class="tag">density</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function particles(){const count=<span class="n">12000</span>,pos=new Float32Array(count*<span class="n">3</span>),col=new Float32Array(count*<span class="n">3</span>);for(let i=<span class="n">0</span>;i&lt;count;i++){const a=i*<span class="n">2.399</span>,r=<span class="n">1.2</span>+<span class="n">3.2</span>*((i*<span class="n">37</span>)%count)/count,phi=Math.acos(<span class="n">1</span>-<span class="n">2</span>*((i*<span class="n">53</span>)%count)/count);pos[i*<span class="n">3</span>]=Math.cos(a)*Math.sin(phi)*r;pos[i*<span class="n">3</span>+<span class="n">1</span>]=Math.cos(phi)*r;pos[i*<span class="n">3</span>+<span class="n">2</span>]=Math.sin(a)*Math.sin(phi)*r;const c=new THREE.Color(colors[i%<span class="n">6</span>]);col.set([c.r,c.g,c.b],i*<span class="n">3</span>)}const geo=new THREE.BufferGeometry();geo.setAttribute(<span class="s">&#x27;position&#x27;</span>,new THREE.BufferAttribute(pos,<span class="n">3</span>));geo.setAttribute(<span class="s">&#x27;color&#x27;</span>,new THREE.BufferAttribute(col,<span class="n">3</span>));root.add(new THREE.Points(geo,new THREE.PointsMaterial({size:.<span class="n">055</span>,vertexColors:true,transparent:true,opacity:.<span class="n">8</span>,blending:THREE.AdditiveBlending,depthWrite:false})));root.rotation.y=-.<span class="n">4</span>}
+</code></pre></details>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="shot dark"><img src="out/metaballs-transparent.png" alt="Metaballs" loading="lazy"></figure>
+        <div class="body">
+          <div class="idx">12 · implicit surface</div>
+          <h2>Metaballs</h2>
+          <p class="blurb">How can overlapping fields suggest an organic implicit surface?</p>
+          <div class="tags"><span class="tag">metaball</span><span class="tag">organic</span><span class="tag">surface</span><span class="tag">advanced</span></div>
+          <details><summary>src/main.ts</summary><pre><code>function metaballs(){for(let i=<span class="n">0</span>;i&lt;<span class="n">22</span>;i++){const sphere=new THREE.Mesh(new THREE.SphereGeometry(.<span class="n">65</span>+(i%<span class="n">5</span>)*.<span class="n">11</span>,<span class="n">32</span>,<span class="n">20</span>),new THREE.MeshPhysicalMaterial({color:colors[i%<span class="n">6</span>],transparent:true,opacity:.<span class="n">18</span>,roughness:.<span class="n">12</span>,transmission:.<span class="n">35</span>,thickness:.<span class="n">8</span>,side:THREE.DoubleSide}));const a=i*<span class="n">2.399</span>,r=.<span class="n">2</span>+i*.<span class="n">12</span>;sphere.position.set(Math.cos(a)*r,Math.sin(i*.<span class="n">8</span>)*<span class="n">1.4</span>,Math.sin(a)*r*.<span class="n">65</span>);root.add(sphere)}const shell=new THREE.Mesh(new THREE.TorusKnotGeometry(<span class="n">2.1</span>,.<span class="n">2</span>,<span class="n">220</span>,<span class="n">18</span>,<span class="n">3</span>,<span class="n">5</span>),new THREE.MeshPhysicalMaterial({color:<span class="n">0</span>x54d6c6,transparent:true,opacity:.<span class="n">25</span>,roughness:.<span class="n">2</span>,transmission:.<span class="n">4</span>}));root.add(shell);root.rotation.set(.<span class="n">25</span>,-.<span class="n">4</span>,.<span class="n">15</span>)}
+</code></pre></details>
+        </div>
+      </article>
+  </main>
+  <footer>
+    Generated by <code>tools/gallery.py</code> — regenerate with <code>just gallery</code>
+    after <code>just build</code>. Images are referenced from
+    <code>out/</code>, so open this file straight from the checkout.
+  </footer>
+</div>
+</body>
+</html>
