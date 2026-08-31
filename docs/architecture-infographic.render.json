@@ -69,7 +69,7 @@
       "description": "12 个场景渲染函数，统一 WebGL 渲染器配置（alpha:true, ACES tone mapping）"
     },
     {
-      "path": "../scripts/capture.mjs",
+      "path": "../tools/capture.mjs",
       "description": "Playwright 截图脚本，SwiftShader WebGL，pngjs 像素级 RGBA 验证"
     }
   ],
