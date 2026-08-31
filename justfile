@@ -15,3 +15,9 @@ test: build
 # Browser demo repo — no binary, no launcher (ADR-749: nothing to install).
 install:
     @echo "threejs-demos: browser demos, nothing to install"
+
+# Remove generated images.
+clean:
+    rm -rf out
+    mkdir -p out
+    touch out/.gitkeep
