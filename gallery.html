@@ -32,6 +32,19 @@ h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:650}
 .pill{font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
   background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 11px}
 .pill b{color:var(--ink);font-weight:600}
+.controls{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding:12px 0;margin:0 0 26px;background:linear-gradient(var(--bg) 80%,transparent)}
+.controls input{flex:1 1 220px;max-width:400px;border:1px solid var(--line);border-radius:10px;
+  background:var(--panel);color:var(--ink);padding:9px 13px;font-size:14px;font-family:inherit}
+.controls input:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);cursor:pointer;
+  background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+.chip span{color:var(--faint);margin-left:3px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.chip[aria-pressed="true"] span{color:var(--bg);opacity:.75}
+#count{margin-left:auto;color:var(--muted);font:12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+#empty{color:var(--muted);font-size:14px}
 .grid{display:grid;gap:26px;grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
   overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
@@ -86,8 +99,14 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
     <p class="tagline">Twelve composed WebGL scenes exported through a true alpha renderer from a static, reproducible camera pose — orbital, terrain, crystal, molecular and lattice studies.</p>
     <div class="meta"><span class="pill">three.js</span><span class="pill"><b>12</b> demos</span><span class="pill"><b>12</b> rendered</span></div>
   </header>
+  <section class="controls" aria-label="Gallery filters">
+    <input id="q" type="search" placeholder="Filter by title, blurb, tag, or family…" autocomplete="off" aria-label="Filter demos">
+    
+    <output id="count" aria-live="polite">12 shown</output>
+  </section>
+  <p id="empty" hidden>No demos match the current filter.</p>
   <main class="grid">
-      <article class="card">
+      <article class="card" data-family="astronomical" data-search="orbital how can a spatial instrument show nested orbital families? orbit instrument 3d advanced 01 · astronomical astronomical">
         <figure class="shot dark"><img src="out/orbital-transparent.png" alt="Orbital" loading="lazy"></figure>
         <div class="body">
           <div class="idx">01 · astronomical</div>
@@ -101,7 +120,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="scientific surface" data-search="terrain how can a spectral field become an explorable terrain? surface wireframe field advanced 02 · scientific surface scientific surface">
         <figure class="shot dark"><img src="out/terrain-transparent.png" alt="Terrain" loading="lazy"></figure>
         <div class="body">
           <div class="idx">02 · scientific surface</div>
@@ -117,7 +136,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="generative sculpture" data-search="crystal how can repeated polyhedra form a coherent crystal field? instancing crystal sculpture advanced 03 · generative sculpture generative sculpture">
         <figure class="shot dark"><img src="out/crystal-transparent.png" alt="Crystal" loading="lazy"></figure>
         <div class="body">
           <div class="idx">03 · generative sculpture</div>
@@ -131,7 +150,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="molecular" data-search="molecule how can bond geometry and atom classes remain legible in 3d? molecule bonds science advanced 04 · molecular molecular">
         <figure class="shot dark"><img src="out/molecule-transparent.png" alt="Molecule" loading="lazy"></figure>
         <div class="body">
           <div class="idx">04 · molecular</div>
@@ -142,7 +161,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="spatial system" data-search="city how can urban density and circulation be expressed without a basemap? city instancing urban advanced 05 · spatial system spatial system">
         <figure class="shot dark"><img src="out/city-transparent.png" alt="City" loading="lazy"></figure>
         <div class="body">
           <div class="idx">05 · spatial system</div>
@@ -153,7 +172,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="geospatial" data-search="globe how can routes and stations wrap a transparent globe? globe routes geospatial advanced 06 · geospatial geospatial">
         <figure class="shot dark"><img src="out/globe-transparent.png" alt="Globe" loading="lazy"></figure>
         <div class="body">
           <div class="idx">06 · geospatial</div>
@@ -164,7 +183,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="flow field" data-search="ribbons how can layered ribbons expose the structure of a vector flow? ribbon flow curve advanced 07 · flow field flow field">
         <figure class="shot dark"><img src="out/ribbons-transparent.png" alt="Ribbons" loading="lazy"></figure>
         <div class="body">
           <div class="idx">07 · flow field</div>
@@ -175,7 +194,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="material science" data-search="lattice how do unit cells repeat into a readable lattice? lattice instancing materials advanced 08 · material science material science">
         <figure class="shot dark"><img src="out/lattice-transparent.png" alt="Lattice" loading="lazy"></figure>
         <div class="body">
           <div class="idx">08 · material science</div>
@@ -186,7 +205,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="scientific glyphs" data-search="vectors how can directional glyphs encode a three-dimensional field? vectors glyphs field advanced 09 · scientific glyphs scientific glyphs">
         <figure class="shot dark"><img src="out/vectors-transparent.png" alt="Vectors" loading="lazy"></figure>
         <div class="body">
           <div class="idx">09 · scientific glyphs</div>
@@ -197,7 +216,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="topology" data-search="knots how can several knot families be compared in one scene? knot topology curves advanced 10 · topology topology">
         <figure class="shot dark"><img src="out/knots-transparent.png" alt="Knots" loading="lazy"></figure>
         <div class="body">
           <div class="idx">10 · topology</div>
@@ -208,7 +227,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="particle system" data-search="particles how does a seeded particle shell reveal spatial density? particles points density advanced 11 · particle system particle system">
         <figure class="shot dark"><img src="out/particles-transparent.png" alt="Particles" loading="lazy"></figure>
         <div class="body">
           <div class="idx">11 · particle system</div>
@@ -219,7 +238,7 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
 </code></pre></details>
         </div>
       </article>
-      <article class="card">
+      <article class="card" data-family="implicit surface" data-search="metaballs how can overlapping fields suggest an organic implicit surface? metaball organic surface advanced 12 · implicit surface implicit surface">
         <figure class="shot dark"><img src="out/metaballs-transparent.png" alt="Metaballs" loading="lazy"></figure>
         <div class="body">
           <div class="idx">12 · implicit surface</div>
@@ -237,5 +256,38 @@ footer code{background:var(--chip);border-radius:4px;padding:2px 6px;
     <code>out/</code>, so open this file straight from the checkout.
   </footer>
 </div>
+<script>
+(function(){
+  var q=document.getElementById('q'),count=document.getElementById('count'),empty=document.getElementById('empty');
+  var cards=[].slice.call(document.querySelectorAll('.card'));
+  var chips=[].slice.call(document.querySelectorAll('.chip'));
+  var family='';
+  function apply(){
+    var t=q.value.trim().toLowerCase(),n=0;
+    for(var i=0;i<cards.length;i++){
+      var c=cards[i];
+      var ok=(!family||c.getAttribute('data-family')===family)&&
+             (!t||(c.getAttribute('data-search')||'').indexOf(t)>=0);
+      c.style.display=ok?'':'none';
+      if(ok)n++;
+    }
+    count.value=n+' / '+cards.length+' shown';
+    empty.hidden=n>0;
+    for(var j=0;j<chips.length;j++){
+      var ch=chips[j];
+      ch.setAttribute('aria-pressed',String(ch.getAttribute('data-family')===family));
+    }
+  }
+  q.addEventListener('input',apply);
+  chips.forEach(function(ch){
+    ch.addEventListener('click',function(){
+      var f=ch.getAttribute('data-family');
+      family=(f===family)?'':f;
+      apply();
+    });
+  });
+  apply();
+})();
+</script>
 </body>
 </html>

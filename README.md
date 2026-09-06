@@ -2,6 +2,8 @@
 
 Twelve carefully composed WebGL scenes with a true alpha renderer and static, reproducible export pose.
 
+Browse every demo with its source in **[gallery.html](gallery.html)** — searchable, follows your light/dark theme.
+
 `catalog.json` records the scene use, question, family, complexity, and techniques.
 
 | Orbital | Terrain | Crystal | Molecule |
