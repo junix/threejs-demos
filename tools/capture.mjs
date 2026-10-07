@@ -39,6 +39,17 @@ try {
     await page.mouse.move(box.x + box.width * .54, box.y + box.height * .46);
     const after = await page.evaluate(() => window.__INTERACTION_COUNT__ ?? 0);
     if (after <= before) throw new Error(`${scene}: interaction contract did not fire`);
+    if (scene === 'vectors') {
+      const lengths = await page.evaluate(() => window.__ARROW_LENGTHS__ ?? []);
+      const expected = [];
+      for (let x=-4;x<=4;x++)for(let y=-3;y<=3;y++)for(let z=-2;z<=2;z++){
+        if ((x+y+z)%2) continue;
+        expected.push(.8+Math.hypot(-y*.18, x*.2, Math.sin((x+z)*.7)*.35));
+      }
+      if (lengths.length !== expected.length) throw new Error(`vectors: expected ${expected.length} arrows, got ${lengths.length}`);
+      if (new Set(lengths).size < 3) throw new Error(`vectors: arrow lengths must vary with field magnitude, saw only ${new Set(lengths).size} distinct lengths`);
+      expected.forEach((want, i) => { if (Math.abs(lengths[i]-want) > 1e-9) throw new Error(`vectors: arrow ${i} length ${lengths[i]}, expected ${want}`) });
+    }
     if (errors.length) throw new Error(`${scene}: browser errors: ${errors.join(' | ')}`);
     const png = PNG.sync.read(await readFile(`out/${scene}-transparent.png`));
     let transparent = 0, visible = 0, colorful = 0;
